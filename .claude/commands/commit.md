@@ -1,0 +1,1 @@
+Add all the changes to staged and do commit and push, using the diff to create a message that explains the changes
