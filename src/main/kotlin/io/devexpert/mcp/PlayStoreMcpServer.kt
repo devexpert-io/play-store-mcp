@@ -4,6 +4,7 @@ import io.modelcontextprotocol.kotlin.sdk.Implementation
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
+import io.devexpert.tools.TestTools
 import org.slf4j.LoggerFactory
 
 class PlayStoreMcpServer {
@@ -61,7 +62,8 @@ class PlayStoreMcpServer {
     
     private fun setupTools() {
         logger.debug("Setting up MCP tools...")
-        // TODO: Implement tool setup
+        val testTools = TestTools()
+        testTools.registerTools(server)
     }
     
     private fun setupPrompts() {

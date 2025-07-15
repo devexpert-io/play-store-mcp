@@ -3,6 +3,8 @@ kotlin = "2.2.0"
 mcp-kotlin-sdk = "0.5.0"
 kotlinx-coroutines = "1.7.3"
 kotlinx-serialization = "1.6.2"
+kotlinx-io = "0.5.4"
+shadow = "8.1.1"
 slf4j = "2.0.9"
 logback = "1.5.15"
 google-play-console = "v3-rev20250710-2.0.0"
@@ -12,6 +14,7 @@ junit = "5.10.1"
 mcp-kotlin-sdk = { group = "io.modelcontextprotocol", name = "kotlin-sdk", version.ref = "mcp-kotlin-sdk" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-io-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version.ref = "kotlinx-io" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
 google-play-console = { group = "com.google.apis", name = "google-api-services-androidpublisher", version.ref = "google-play-console" }
@@ -21,3 +24,4 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.r
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

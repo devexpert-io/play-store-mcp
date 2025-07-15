@@ -1,6 +1,7 @@
 package io.devexpert
 
 import io.devexpert.mcp.PlayStoreMcpServer
+import io.devexpert.transport.StdioTransport
 import org.slf4j.LoggerFactory
 import kotlin.system.exitProcess
 
@@ -12,11 +13,12 @@ fun main() {
     try {
         val mcpServer = PlayStoreMcpServer()
         mcpServer.initialize()
-
+        
+        val server = mcpServer.getServer()
         logger.info("Play Store MCP Server initialized successfully")
         
-        // TODO: Setup transport and start server
-        logger.info("Server ready to accept connections")
+        val transport = StdioTransport()
+        transport.startServer(server)
         
     } catch (e: Exception) {
         logger.error("Failed to start Play Store MCP Server", e)
