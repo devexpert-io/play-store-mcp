@@ -5,6 +5,7 @@ import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.devexpert.tools.TestTools
+import io.devexpert.resources.PlayStoreResources
 import org.slf4j.LoggerFactory
 
 class PlayStoreMcpServer {
@@ -57,7 +58,8 @@ class PlayStoreMcpServer {
     
     private fun setupResources() {
         logger.debug("Setting up MCP resources...")
-        // TODO: Implement resource setup
+        val playStoreResources = PlayStoreResources()
+        playStoreResources.registerResources(server)
     }
     
     private fun setupTools() {
