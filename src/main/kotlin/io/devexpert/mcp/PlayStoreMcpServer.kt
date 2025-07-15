@@ -6,6 +6,7 @@ import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.devexpert.tools.PlayStoreTools
 import io.devexpert.resources.PlayStoreResources
+import io.devexpert.prompts.PlayStorePrompts
 import org.slf4j.LoggerFactory
 
 class PlayStoreMcpServer {
@@ -72,6 +73,9 @@ class PlayStoreMcpServer {
     
     private fun setupPrompts() {
         logger.debug("Setting up MCP prompts...")
-        // TODO: Implement prompt setup
+        
+        // Register Play Store guidance prompts
+        val playStorePrompts = PlayStorePrompts()
+        playStorePrompts.registerPrompts(server)
     }
 }
