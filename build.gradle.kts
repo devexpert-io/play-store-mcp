@@ -1,10 +1,15 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
+    application
 }
 
 group = "io.devexpert"
 version = "1.0-SNAPSHOT"
+
+application {
+    mainClass.set("io.devexpert.MainKt")
+}
 
 repositories {
     mavenCentral()
@@ -23,8 +28,7 @@ dependencies {
     // Logging
     implementation(libs.slf4j.api)
     implementation(libs.logback.classic)
-    
-    // Google Play Console API
+
     implementation(libs.google.play.console)
     
     // Testing
