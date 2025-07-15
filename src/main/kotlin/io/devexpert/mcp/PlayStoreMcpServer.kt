@@ -7,6 +7,8 @@ import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.devexpert.tools.PlayStoreTools
 import io.devexpert.resources.PlayStoreResources
 import io.devexpert.prompts.PlayStorePrompts
+import io.devexpert.playstore.PlayStoreService
+import io.devexpert.playstore.PlayStoreConfig
 import org.slf4j.LoggerFactory
 
 class PlayStoreMcpServer {
@@ -38,10 +40,37 @@ class PlayStoreMcpServer {
         serverInfo = serverInfo,
         options = serverOptions
     )
+    
+    private val playStoreService: PlayStoreService by lazy {
+        initializePlayStoreService()
+    }
 
     fun getServer(): Server {
         logger.info("Initializing Play Store MCP Server v${serverInfo.version}")
         return server
+    }
+    
+    private fun initializePlayStoreService(): PlayStoreService {
+        logger.info("Initializing Play Store Service...")
+        
+        val config = PlayStoreConfig(
+            serviceAccountKeyPath = System.getenv("PLAY_STORE_SERVICE_ACCOUNT_KEY_PATH") 
+                ?: "service-account-key.json",
+            applicationName = "Play Store MCP Server",
+            packageNames = System.getenv("PLAY_STORE_PACKAGE_NAMES")?.split(",")?.map { it.trim() } 
+                ?: emptyList(),
+            defaultTrack = System.getenv("PLAY_STORE_DEFAULT_TRACK") ?: "internal",
+            enableMockMode = System.getenv("PLAY_STORE_MOCK_MODE")?.toBoolean() ?: false
+        )
+        
+        logger.info("Play Store Configuration:")
+        logger.info("- Service Account Key Path: ${config.serviceAccountKeyPath}")
+        logger.info("- Application Name: ${config.applicationName}")
+        logger.info("- Package Names: ${config.packageNames}")
+        logger.info("- Default Track: ${config.defaultTrack}")
+        logger.info("- Mock Mode: ${config.enableMockMode}")
+        
+        return PlayStoreService(config)
     }
     
     fun initialize() {
@@ -50,8 +79,7 @@ class PlayStoreMcpServer {
         logger.info("- Tools: ListChanged=${serverCapabilities.tools?.listChanged}")
         logger.info("- Prompts: ListChanged=${serverCapabilities.prompts?.listChanged}")
         logger.info("- Logging: Enabled=${serverCapabilities.logging != null}")
-        
-        // TODO: Setup resources, tools, and prompts
+
         setupResources()
         setupTools()
         setupPrompts()
@@ -59,7 +87,7 @@ class PlayStoreMcpServer {
     
     private fun setupResources() {
         logger.debug("Setting up MCP resources...")
-        val playStoreResources = PlayStoreResources()
+        val playStoreResources = PlayStoreResources(playStoreService)
         playStoreResources.registerResources(server)
     }
     
@@ -67,7 +95,7 @@ class PlayStoreMcpServer {
         logger.debug("Setting up MCP tools...")
         
         // Register Play Store deployment tools
-        val playStoreTools = PlayStoreTools()
+        val playStoreTools = PlayStoreTools(playStoreService)
         playStoreTools.registerTools(server)
     }
     

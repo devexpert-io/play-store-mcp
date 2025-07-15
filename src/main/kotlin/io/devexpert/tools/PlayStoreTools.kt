@@ -1,16 +1,18 @@
 package io.devexpert.tools
 
+import io.devexpert.playstore.PlayStoreService
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.Server
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
 
-class PlayStoreTools {
+class PlayStoreTools(private val playStoreService: PlayStoreService) {
     private val logger = LoggerFactory.getLogger(PlayStoreTools::class.java)
 
     fun registerTools(server: Server) {
@@ -62,37 +64,41 @@ class PlayStoreTools {
                 if (it is JsonPrimitive) it.content else it.toString() 
             } ?: ""
             val versionCode = request.arguments["versionCode"]?.let { 
-                if (it is JsonPrimitive) it.content.toIntOrNull() else null 
-            } ?: 1
+                if (it is JsonPrimitive) it.content.toLongOrNull() else null 
+            } ?: 1L
             val releaseNotes = request.arguments["releaseNotes"]?.let { 
                 if (it is JsonPrimitive) it.content else it.toString() 
             } ?: "No release notes provided"
 
             logger.info("Deploy app tool called: $packageName to $track track")
 
-            // Simulate deployment process
-            val deploymentId = UUID.randomUUID().toString()
+            val deploymentResult = runBlocking {
+                playStoreService.deployApp(packageName, track, apkPath, versionCode, releaseNotes)
+            }
+
             val result = buildString {
-                appendLine("🚀 App Deployment Started")
-                appendLine("================================")
-                appendLine("Package Name: $packageName")
-                appendLine("Track: $track")
-                appendLine("APK Path: $apkPath")
-                appendLine("Version Code: $versionCode")
-                appendLine("Release Notes: $releaseNotes")
-                appendLine("")
-                appendLine("Deployment Status:")
-                appendLine("✅ APK uploaded successfully")
-                appendLine("✅ Version code validated")
-                appendLine("✅ Release created in $track track")
-                appendLine("⏳ Rollout started (0% -> 5%)")
-                appendLine("")
-                appendLine("Deployment ID: $deploymentId")
-                appendLine("Started at: ${Instant.now()}")
-                appendLine("Estimated completion: ${Instant.now().plusSeconds(1800)}")
-                appendLine("")
-                appendLine("Note: This is a mock deployment. In real integration,")
-                appendLine("this would upload to Google Play Console API.")
+                if (deploymentResult.success) {
+                    appendLine("🚀 App Deployment Successful")
+                    appendLine("================================")
+                    appendLine("Package Name: $packageName")
+                    appendLine("Track: $track")
+                    appendLine("Version Code: $versionCode")
+                    appendLine("Deployment ID: ${deploymentResult.deploymentId}")
+                    appendLine("")
+                    appendLine("✅ ${deploymentResult.message}")
+                    appendLine("Started at: ${Instant.now()}")
+                } else {
+                    appendLine("❌ App Deployment Failed")
+                    appendLine("================================")
+                    appendLine("Package Name: $packageName")
+                    appendLine("Track: $track")
+                    appendLine("Version Code: $versionCode")
+                    appendLine("")
+                    appendLine("Error: ${deploymentResult.message}")
+                    deploymentResult.error?.let { error ->
+                        appendLine("Details: ${error.message}")
+                    }
+                }
             }
 
             CallToolResult(
@@ -207,18 +213,31 @@ class PlayStoreTools {
 
             logger.info("Update app metadata tool called for: $packageName")
 
+            val updateResult = runBlocking {
+                playStoreService.updateAppMetadata(packageName, title, shortDescription, fullDescription)
+            }
+
             val result = buildString {
-                appendLine("📝 App Metadata Updated")
-                appendLine("=======================")
-                appendLine("Package Name: $packageName")
-                if (title != null) appendLine("Title: $title")
-                if (shortDescription != null) appendLine("Short Description: $shortDescription")
-                if (fullDescription != null) appendLine("Full Description: ${fullDescription.take(100)}...")
-                appendLine("")
-                appendLine("✅ Store listing updated successfully")
-                appendLine("Updated at: ${Instant.now()}")
-                appendLine("")
-                appendLine("Note: Changes may take up to 2 hours to appear in Play Store")
+                if (updateResult) {
+                    appendLine("📝 App Metadata Updated Successfully")
+                    appendLine("==================================")
+                    appendLine("Package Name: $packageName")
+                    if (title != null) appendLine("Title: $title")
+                    if (shortDescription != null) appendLine("Short Description: $shortDescription")
+                    if (fullDescription != null) appendLine("Full Description: ${fullDescription.take(100)}...")
+                    appendLine("")
+                    appendLine("✅ Store listing updated successfully")
+                    appendLine("Updated at: ${Instant.now()}")
+                    appendLine("")
+                    appendLine("Note: Changes may take up to 2 hours to appear in Play Store")
+                } else {
+                    appendLine("❌ App Metadata Update Failed")
+                    appendLine("============================")
+                    appendLine("Package Name: $packageName")
+                    appendLine("")
+                    appendLine("Error: Failed to update metadata")
+                    appendLine("Please check API credentials and package name")
+                }
             }
 
             CallToolResult(
@@ -274,29 +293,40 @@ class PlayStoreTools {
                 if (it is JsonPrimitive) it.content else it.toString() 
             } ?: "alpha"
             val versionCode = request.arguments["versionCode"]?.let { 
-                if (it is JsonPrimitive) it.content.toIntOrNull() else null 
-            } ?: 1
+                if (it is JsonPrimitive) it.content.toLongOrNull() else null 
+            } ?: 1L
 
             logger.info("Promote release tool called: $packageName from $fromTrack to $toTrack")
 
-            val promotionId = UUID.randomUUID().toString()
+            val promotionResult = runBlocking {
+                playStoreService.promoteRelease(packageName, fromTrack, toTrack, versionCode)
+            }
+
             val result = buildString {
-                appendLine("⬆️ Release Promotion Started")
-                appendLine("============================")
-                appendLine("Package Name: $packageName")
-                appendLine("Version Code: $versionCode")
-                appendLine("From Track: $fromTrack")
-                appendLine("To Track: $toTrack")
-                appendLine("Promotion ID: $promotionId")
-                appendLine("")
-                appendLine("Status:")
-                appendLine("✅ Version validated in source track")
-                appendLine("✅ Target track prepared")
-                appendLine("⏳ Promoting release...")
-                appendLine("")
-                appendLine("Estimated completion: ${Instant.now().plusSeconds(900)}")
-                appendLine("")
-                appendLine("The release will be available in $toTrack track once promotion completes.")
+                if (promotionResult.success) {
+                    appendLine("⬆️ Release Promotion Successful")
+                    appendLine("============================")
+                    appendLine("Package Name: $packageName")
+                    appendLine("Version Code: $versionCode")
+                    appendLine("From Track: $fromTrack")
+                    appendLine("To Track: $toTrack")
+                    appendLine("Promotion ID: ${promotionResult.deploymentId}")
+                    appendLine("")
+                    appendLine("✅ ${promotionResult.message}")
+                    appendLine("Completed at: ${Instant.now()}")
+                } else {
+                    appendLine("❌ Release Promotion Failed")
+                    appendLine("============================")
+                    appendLine("Package Name: $packageName")
+                    appendLine("Version Code: $versionCode")
+                    appendLine("From Track: $fromTrack")
+                    appendLine("To Track: $toTrack")
+                    appendLine("")
+                    appendLine("Error: ${promotionResult.message}")
+                    promotionResult.error?.let { error ->
+                        appendLine("Details: ${error.message}")
+                    }
+                }
             }
 
             CallToolResult(
@@ -306,6 +336,6 @@ class PlayStoreTools {
             )
         }
 
-        logger.info("Play Store tools registered successfully: deploy_app, create_release, update_app_metadata, promote_release")
+        logger.info("Play Store tools registered successfully: deploy_app, create_release, update_app_metadata, promote_release, debug_configuration")
     }
 }
