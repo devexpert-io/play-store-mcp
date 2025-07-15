@@ -4,7 +4,7 @@ import io.modelcontextprotocol.kotlin.sdk.Implementation
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
-import io.devexpert.tools.TestTools
+import io.devexpert.tools.PlayStoreTools
 import io.devexpert.resources.PlayStoreResources
 import org.slf4j.LoggerFactory
 
@@ -64,8 +64,10 @@ class PlayStoreMcpServer {
     
     private fun setupTools() {
         logger.debug("Setting up MCP tools...")
-        val testTools = TestTools()
-        testTools.registerTools(server)
+        
+        // Register Play Store deployment tools
+        val playStoreTools = PlayStoreTools()
+        playStoreTools.registerTools(server)
     }
     
     private fun setupPrompts() {
