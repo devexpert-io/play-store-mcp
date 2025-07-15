@@ -57,7 +57,13 @@ src/
 - **SLF4J + Logback**: For logging
 - **kotlin("test")**: For testing
 
-All dependencies are managed through the `build.gradle.kts` file.
+All dependencies are managed through the `build.gradle.kts` file using the version catalog in `gradle/libs.versions.toml`.
+
+### Dependency Management
+- **ALWAYS** use the version catalog (`gradle/libs.versions.toml`) for dependency management
+- Define all versions, libraries, and plugins in the version catalog
+- Reference dependencies in `build.gradle.kts` using `libs.` prefix
+- This ensures consistent versions across the project and easier maintenance
 
 ## Architecture Notes
 - **Transport Layer**: Abstracted to support multiple MCP protocols (STDIO initially, extensible for others)
