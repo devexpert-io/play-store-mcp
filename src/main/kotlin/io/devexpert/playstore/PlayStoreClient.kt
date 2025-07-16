@@ -1,9 +1,14 @@
 package io.devexpert.playstore
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.http.FileContent
+import com.google.api.client.http.HttpRequestInitializer
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.androidpublisher.AndroidPublisher
 import com.google.api.services.androidpublisher.AndroidPublisherScopes
+import com.google.api.services.androidpublisher.model.LocalizedText
+import com.google.api.services.androidpublisher.model.Track
+import com.google.api.services.androidpublisher.model.TrackRelease
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.ServiceAccountCredentials
 import org.slf4j.LoggerFactory
@@ -43,7 +48,7 @@ class PlayStoreClient(
             
             val httpCredentialsAdapter = HttpCredentialsAdapter(credential)
 
-            val requestInitializer = com.google.api.client.http.HttpRequestInitializer { request ->
+            val requestInitializer = HttpRequestInitializer { request ->
                 httpCredentialsAdapter.initialize(request)
                 request.connectTimeout = 60000 // 60 seconds
                 request.readTimeout = 600000 // 10 minutes for large file uploads
@@ -134,12 +139,12 @@ class PlayStoreClient(
             val uploadRequest = if (apkPath.endsWith(".aab")) {
                 publisher.edits().bundles().upload(
                     packageName, editId,
-                    com.google.api.client.http.FileContent("application/octet-stream", apkFile)
+                    FileContent("application/octet-stream", apkFile)
                 )
             } else {
                 publisher.edits().apks().upload(
                     packageName, editId,
-                    com.google.api.client.http.FileContent("application/vnd.android.package-archive", apkFile)
+                    FileContent("application/vnd.android.package-archive", apkFile)
                 )
             }
 
@@ -147,7 +152,7 @@ class PlayStoreClient(
             logger.debug("Upload completed, version code: $versionCode")
 
             // Create a release
-            val release = com.google.api.services.androidpublisher.model.TrackRelease()
+            val release = TrackRelease()
             release.name = "Release $versionCode"
             release.versionCodes = listOf(versionCode)
             
@@ -160,14 +165,14 @@ class PlayStoreClient(
             }
 
             if (!releaseNotes.isNullOrBlank()) {
-                val releaseNote = com.google.api.services.androidpublisher.model.LocalizedText()
+                val releaseNote = LocalizedText()
                 releaseNote.language = "en-US"
                 releaseNote.text = releaseNotes
                 release.releaseNotes = listOf(releaseNote)
             }
 
             // Update the track
-            val trackUpdate = com.google.api.services.androidpublisher.model.Track()
+            val trackUpdate = Track()
             trackUpdate.track = track
             trackUpdate.releases = listOf(release)
 
@@ -225,13 +230,13 @@ class PlayStoreClient(
             } ?: throw PlayStoreException("Version $versionCode not found in $fromTrack track")
 
             // Create new release for target track
-            val newRelease = com.google.api.services.androidpublisher.model.TrackRelease()
+            val newRelease = TrackRelease()
             newRelease.name = sourceRelease.name
             newRelease.versionCodes = sourceRelease.versionCodes
             newRelease.status = "completed"
             newRelease.releaseNotes = sourceRelease.releaseNotes
 
-            val targetTrack = com.google.api.services.androidpublisher.model.Track()
+            val targetTrack = Track()
             targetTrack.track = toTrack
             targetTrack.releases = listOf(newRelease)
 
