@@ -48,8 +48,7 @@ class PlayStoreMcpServer {
         logger.info("Initializing Play Store Service...")
         
         val config = PlayStoreConfig(
-            serviceAccountKeyPath = System.getenv("PLAY_STORE_SERVICE_ACCOUNT_KEY_PATH") 
-                ?: "service-account-key.json",
+            serviceAccountKeyPath = System.getenv("PLAY_STORE_SERVICE_ACCOUNT_KEY_PATH"),
             applicationName = "Play Store MCP Server",
             defaultTrack = System.getenv("PLAY_STORE_DEFAULT_TRACK") ?: "internal"
         )
