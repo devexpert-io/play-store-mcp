@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.devexpert"
-version = "1.0-SNAPSHOT"
+version = "0.1.0-alpha"
 
 application {
     mainClass.set("io.devexpert.MainKt")
