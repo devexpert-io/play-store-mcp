@@ -1,10 +1,11 @@
 package io.devexpert.playstore
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.androidpublisher.AndroidPublisher
 import com.google.api.services.androidpublisher.AndroidPublisherScopes
+import com.google.auth.http.HttpCredentialsAdapter
+import com.google.auth.oauth2.ServiceAccountCredentials
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
@@ -36,14 +37,14 @@ class PlayStoreClient(
                 throw IllegalArgumentException("Service account key file not found: $serviceAccountKeyPath")
             }
 
-            val credential = GoogleCredential.fromStream(
-                FileInputStream(credentialsFile),
-                httpTransport,
-                jsonFactory
+            val credential = ServiceAccountCredentials.fromStream(
+                FileInputStream(credentialsFile)
             ).createScoped(listOf(AndroidPublisherScopes.ANDROIDPUBLISHER))
+            
+            val httpCredentialsAdapter = HttpCredentialsAdapter(credential)
 
             // Build the API client
-            val publisher = AndroidPublisher.Builder(httpTransport, jsonFactory, credential)
+            val publisher = AndroidPublisher.Builder(httpTransport, jsonFactory, httpCredentialsAdapter)
                 .setApplicationName(applicationName)
                 .build()
 

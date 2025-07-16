@@ -34,6 +34,7 @@ dependencies {
     implementation(libs.logback.classic)
 
     implementation(libs.google.play.console)
+    implementation(libs.google.auth.library)
     
     // Testing
     testImplementation(libs.kotlin.test)
