@@ -36,6 +36,5 @@ data class PlayStoreConfig(
     val serviceAccountKeyPath: String,
     val applicationName: String = "Play Store MCP Server",
     val packageNames: List<String> = emptyList(), // Apps to monitor
-    val defaultTrack: String = "internal",
-    val enableMockMode: Boolean = false // Fallback to mock data if API fails
+    val defaultTrack: String = "internal"
 )

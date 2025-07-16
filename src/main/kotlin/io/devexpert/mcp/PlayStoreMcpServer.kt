@@ -58,8 +58,7 @@ class PlayStoreMcpServer {
             applicationName = "Play Store MCP Server",
             packageNames = System.getenv("PLAY_STORE_PACKAGE_NAMES")?.split(",")?.map { it.trim() } 
                 ?: emptyList(),
-            defaultTrack = System.getenv("PLAY_STORE_DEFAULT_TRACK") ?: "internal",
-            enableMockMode = System.getenv("PLAY_STORE_MOCK_MODE")?.toBoolean() ?: false
+            defaultTrack = System.getenv("PLAY_STORE_DEFAULT_TRACK") ?: "internal"
         )
         
         logger.info("Play Store Configuration:")
@@ -67,7 +66,6 @@ class PlayStoreMcpServer {
         logger.info("- Application Name: ${config.applicationName}")
         logger.info("- Package Names: ${config.packageNames}")
         logger.info("- Default Track: ${config.defaultTrack}")
-        logger.info("- Mock Mode: ${config.enableMockMode}")
         
         return PlayStoreService(config)
     }
