@@ -43,8 +43,14 @@ class PlayStoreClient(
             
             val httpCredentialsAdapter = HttpCredentialsAdapter(credential)
 
-            // Build the API client
-            val publisher = AndroidPublisher.Builder(httpTransport, jsonFactory, httpCredentialsAdapter)
+            val requestInitializer = com.google.api.client.http.HttpRequestInitializer { request ->
+                httpCredentialsAdapter.initialize(request)
+                request.connectTimeout = 60000 // 60 seconds
+                request.readTimeout = 600000 // 10 minutes for large file uploads
+            }
+            
+            // Build the API client with extended timeouts
+            val publisher = AndroidPublisher.Builder(httpTransport, jsonFactory, requestInitializer)
                 .setApplicationName(applicationName)
                 .build()
 
