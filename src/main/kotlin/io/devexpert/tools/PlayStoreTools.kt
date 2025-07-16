@@ -58,24 +58,12 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
                 required = listOf("packageName", "track", "apkPath", "versionCode")
             )
         ) { request ->
-            val packageName = request.arguments["packageName"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: "unknown"
-            val track = request.arguments["track"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: "internal"
-            val apkPath = request.arguments["apkPath"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: ""
-            val versionCode = request.arguments["versionCode"]?.let { 
-                if (it is JsonPrimitive) it.content.toLongOrNull() else null 
-            } ?: 1L
-            val releaseNotes = request.arguments["releaseNotes"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: "No release notes provided"
-            val rolloutPercentage = request.arguments["rolloutPercentage"]?.let { 
-                if (it is JsonPrimitive) it.content.toDoubleOrNull() else null 
-            } ?: 1.0
+            val packageName = request.arguments.getArgument("packageName", "unknown")
+            val track = request.arguments.getArgument("track", "internal")
+            val apkPath = request.arguments.getArgument("apkPath", "")
+            val versionCode = request.arguments.getArgument("versionCode", 1L)
+            val releaseNotes = request.arguments.getArgument("releaseNotes", "No release notes provided")
+            val rolloutPercentage = request.arguments.getArgument("rolloutPercentage", 1.0)
 
             logger.info("Deploy app tool called: $packageName to $track track with ${(rolloutPercentage * 100).toInt()}% rollout")
 
@@ -150,18 +138,10 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
                 required = listOf("packageName", "fromTrack", "toTrack", "versionCode")
             )
         ) { request ->
-            val packageName = request.arguments["packageName"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: "unknown"
-            val fromTrack = request.arguments["fromTrack"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: "internal"
-            val toTrack = request.arguments["toTrack"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: "alpha"
-            val versionCode = request.arguments["versionCode"]?.let { 
-                if (it is JsonPrimitive) it.content.toLongOrNull() else null 
-            } ?: 1L
+            val packageName = request.arguments.getArgument("packageName", "unknown")
+            val fromTrack = request.arguments.getArgument("fromTrack", "internal")
+            val toTrack = request.arguments.getArgument("toTrack", "alpha")
+            val versionCode = request.arguments.getArgument("versionCode", 1L)
 
             logger.info("Promote release tool called: $packageName from $fromTrack to $toTrack")
 
@@ -216,9 +196,10 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
                 required = listOf("packageName")
             )
         ) { request ->
-            val packageName = request.arguments["packageName"]?.let { 
-                if (it is JsonPrimitive) it.content else it.toString() 
-            } ?: throw IllegalArgumentException("packageName is required")
+            val packageName = request.arguments.getArgument("packageName", "")
+            if (packageName.isBlank()) {
+                throw IllegalArgumentException("packageName is required")
+            }
 
             logger.info("Get releases tool called for package: $packageName")
 
@@ -235,4 +216,15 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
 
         logger.info("Play Store tools registered successfully: deploy_app, promote_release, get_releases")
     }
+}
+
+private inline fun <reified T> Map<String, Any>.getArgument(key: String, defaultValue: T): T {
+    return (this[key] as? JsonPrimitive)?.content?.let {
+        when (T::class) {
+            String::class -> it as T
+            Long::class -> it.toLongOrNull() as? T
+            Double::class -> it.toDoubleOrNull() as? T
+            else -> null
+        }
+    } ?: defaultValue
 }
