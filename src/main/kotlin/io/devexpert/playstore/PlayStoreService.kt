@@ -22,7 +22,6 @@ class PlayStoreService(private val config: PlayStoreConfig) {
 
     init {
         logger.info("Initializing Play Store Service...")
-        logger.info("Configured apps: ${config.packageNames.size}")
     }
 
     private fun initializeClient(): PlayStoreClient {
@@ -40,24 +39,20 @@ class PlayStoreService(private val config: PlayStoreConfig) {
     }
 
     /**
-     * Get release status
+     * Get release status for a specific package
      */
-    suspend fun getReleases(): String = withContext(Dispatchers.IO) {
-        logger.debug("Fetching releases...")
+    suspend fun getReleases(packageName: String): String = withContext(Dispatchers.IO) {
+        logger.debug("Fetching releases for package: $packageName")
 
-        val allReleases = mutableListOf<PlayStoreRelease>()
-
-        for (packageName in config.packageNames) {
-            val releases = playStoreClient.getReleases(packageName)
-            allReleases.addAll(releases)
-        }
+        val releases = playStoreClient.getReleases(packageName)
 
         val result = mapOf(
-            "releases" to allReleases,
+            "packageName" to packageName,
+            "releases" to releases,
             "summary" to mapOf(
-                "totalReleases" to allReleases.size,
-                "activeReleases" to allReleases.count { it.status == "inProgress" },
-                "completedReleases" to allReleases.count { it.status == "completed" }
+                "totalReleases" to releases.size,
+                "activeReleases" to releases.count { it.status == "inProgress" },
+                "completedReleases" to releases.count { it.status == "completed" }
             ),
             "lastUpdate" to Instant.now().toString()
         )

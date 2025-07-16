@@ -196,18 +196,25 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
 
         server.addTool(
             name = "get_releases",
-            description = "Get current status of app releases and deployments",
+            description = "Get current status of app releases and deployments for a specific package",
             inputSchema = Tool.Input(
                 properties = buildJsonObject {
-                    // No parameters needed
+                    put("packageName", buildJsonObject {
+                        put("type", JsonPrimitive("string"))
+                        put("description", JsonPrimitive("Package name of the app (e.g., com.example.myapp)"))
+                    })
                 },
-                required = emptyList()
+                required = listOf("packageName")
             )
         ) { request ->
-            logger.info("Get releases tool called")
+            val packageName = request.arguments["packageName"]?.let { 
+                if (it is JsonPrimitive) it.content else it.toString() 
+            } ?: throw IllegalArgumentException("packageName is required")
+
+            logger.info("Get releases tool called for package: $packageName")
 
             val releasesJson = runBlocking {
-                playStoreService.getReleases()
+                playStoreService.getReleases(packageName)
             }
 
             CallToolResult(

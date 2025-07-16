@@ -51,15 +51,12 @@ class PlayStoreMcpServer {
             serviceAccountKeyPath = System.getenv("PLAY_STORE_SERVICE_ACCOUNT_KEY_PATH") 
                 ?: "service-account-key.json",
             applicationName = "Play Store MCP Server",
-            packageNames = System.getenv("PLAY_STORE_PACKAGE_NAMES")?.split(",")?.map { it.trim() } 
-                ?: emptyList(),
             defaultTrack = System.getenv("PLAY_STORE_DEFAULT_TRACK") ?: "internal"
         )
         
         logger.info("Play Store Configuration:")
         logger.info("- Service Account Key Path: ${config.serviceAccountKeyPath}")
         logger.info("- Application Name: ${config.applicationName}")
-        logger.info("- Package Names: ${config.packageNames}")
         logger.info("- Default Track: ${config.defaultTrack}")
         
         return PlayStoreService(config)
