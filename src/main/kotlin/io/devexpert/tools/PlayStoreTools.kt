@@ -194,6 +194,29 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
             )
         }
 
-        logger.info("Play Store tools registered successfully: deploy_app, create_release, update_app_metadata, promote_release, debug_configuration")
+        server.addTool(
+            name = "get_releases",
+            description = "Get current status of app releases and deployments",
+            inputSchema = Tool.Input(
+                properties = buildJsonObject {
+                    // No parameters needed
+                },
+                required = emptyList()
+            )
+        ) { request ->
+            logger.info("Get releases tool called")
+
+            val releasesJson = runBlocking {
+                playStoreService.getReleases()
+            }
+
+            CallToolResult(
+                content = listOf(
+                    TextContent(text = releasesJson)
+                )
+            )
+        }
+
+        logger.info("Play Store tools registered successfully: deploy_app, promote_release, get_releases")
     }
 }

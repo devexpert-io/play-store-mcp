@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.devexpert.tools.PlayStoreTools
-import io.devexpert.resources.PlayStoreResources
 import io.devexpert.playstore.PlayStoreService
 import io.devexpert.playstore.PlayStoreConfig
 import org.slf4j.LoggerFactory
@@ -19,10 +18,6 @@ class PlayStoreMcpServer {
     )
     
     private val serverCapabilities = ServerCapabilities(
-        resources = ServerCapabilities.Resources(
-            subscribe = true,
-            listChanged = true
-        ),
         tools = ServerCapabilities.Tools(
             listChanged = true
         ),
@@ -72,19 +67,11 @@ class PlayStoreMcpServer {
     
     fun initialize() {
         logger.info("Setting up Play Store MCP Server capabilities:")
-        logger.info("- Resources: Subscribe=${serverCapabilities.resources?.subscribe}, ListChanged=${serverCapabilities.resources?.listChanged}")
         logger.info("- Tools: ListChanged=${serverCapabilities.tools?.listChanged}")
         logger.info("- Prompts: ListChanged=${serverCapabilities.prompts?.listChanged}")
         logger.info("- Logging: Enabled=${serverCapabilities.logging != null}")
 
-        setupResources()
         setupTools()
-    }
-    
-    private fun setupResources() {
-        logger.debug("Setting up MCP resources...")
-        val playStoreResources = PlayStoreResources(playStoreService)
-        playStoreResources.registerResources(server)
     }
     
     private fun setupTools() {
