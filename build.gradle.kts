@@ -44,3 +44,9 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.shadowJar {
+    archiveBaseName.set("play-store-mcp")
+    archiveVersion.set("")
+    archiveClassifier.set("all")
+}
