@@ -106,7 +106,8 @@ class PlayStoreClient(
         track: String,
         apkPath: String,
         versionCode: Long,
-        releaseNotes: String?
+        releaseNotes: String?,
+        rolloutPercentage: Double = 1.0
     ): PlayStoreDeploymentResult {
         logger.info("Deploying app: $packageName to $track track, version $versionCode")
 
@@ -143,7 +144,14 @@ class PlayStoreClient(
             val release = com.google.api.services.androidpublisher.model.TrackRelease()
             release.name = "Release $versionCode"
             release.versionCodes = listOf(versionCode)
-            release.status = "completed"
+            
+            // Set status and rollout percentage (userFraction in the API)
+            if (rolloutPercentage < 1.0) {
+                release.status = "inProgress"
+                release.userFraction = rolloutPercentage
+            } else {
+                release.status = "completed"
+            }
 
             if (!releaseNotes.isNullOrBlank()) {
                 val releaseNote = com.google.api.services.androidpublisher.model.LocalizedText()

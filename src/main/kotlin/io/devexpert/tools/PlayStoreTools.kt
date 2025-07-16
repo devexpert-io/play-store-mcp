@@ -48,6 +48,12 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
                         put("type", JsonPrimitive("string"))
                         put("description", JsonPrimitive("Release notes for this version"))
                     })
+                    put("rolloutPercentage", buildJsonObject {
+                        put("type", JsonPrimitive("number"))
+                        put("description", JsonPrimitive("Rollout percentage (0.0 to 1.0, default: 1.0 for full rollout)"))
+                        put("minimum", JsonPrimitive(0.0))
+                        put("maximum", JsonPrimitive(1.0))
+                    })
                 },
                 required = listOf("packageName", "track", "apkPath", "versionCode")
             )
@@ -67,11 +73,14 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
             val releaseNotes = request.arguments["releaseNotes"]?.let { 
                 if (it is JsonPrimitive) it.content else it.toString() 
             } ?: "No release notes provided"
+            val rolloutPercentage = request.arguments["rolloutPercentage"]?.let { 
+                if (it is JsonPrimitive) it.content.toDoubleOrNull() else null 
+            } ?: 1.0
 
-            logger.info("Deploy app tool called: $packageName to $track track")
+            logger.info("Deploy app tool called: $packageName to $track track with ${(rolloutPercentage * 100).toInt()}% rollout")
 
             val deploymentResult = runBlocking {
-                playStoreService.deployApp(packageName, track, apkPath, versionCode, releaseNotes)
+                playStoreService.deployApp(packageName, track, apkPath, versionCode, releaseNotes, rolloutPercentage)
             }
 
             val result = buildString {

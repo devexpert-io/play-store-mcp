@@ -26,6 +26,7 @@ Deploys a new version of an application to the Play Store.
 - `apkPath` (string): Path to APK or AAB file
 - `versionCode` (integer): Version code (must be higher than current)
 - `releaseNotes` (string, optional): Release notes
+- `rolloutPercentage` (number, optional): Rollout percentage (0.0 to 1.0, default: 1.0 for full rollout)
 
 ### 2. `promote_release`
 Promotes an existing version from one track to another.
@@ -37,9 +38,10 @@ Promotes an existing version from one track to another.
 - `versionCode` (integer): Version code to promote
 
 ### 3. `get_releases`
-Gets the current status of all versions of the configured applications.
+Gets the current status of app releases and deployments for a specific package.
 
-**Parameters:** None
+**Parameters:**
+- `packageName` (string): App package name (e.g., com.example.myapp)
 
 ## Setup
 
@@ -130,11 +132,15 @@ Some samples of prompts are:
 
 If you want to get the current releases of the App:
 
-> Let me know what versions of this App are released in the Play Store.
+> Let me know what versions of com.example.myapp are released in the Play Store.
 
 To release a new version of the App to the alpha channel, you can say:
 
 > Upgrade the version of the App, build the AAB, and upload it to the alpha channel.
+
+To deploy with a gradual rollout (e.g., 10% of users):
+
+> Deploy version 123 of com.example.myapp to production with a 10% rollout.
 
 ## Requirements
 

@@ -73,10 +73,11 @@ class PlayStoreService(private val config: PlayStoreConfig) {
         track: String,
         apkPath: String,
         versionCode: Long,
-        releaseNotes: String?
+        releaseNotes: String?,
+        rolloutPercentage: Double = 1.0
     ): PlayStoreDeploymentResult = withContext(Dispatchers.IO) {
-        logger.info("Deploying app: $packageName to $track")
-        playStoreClient.deployApp(packageName, track, apkPath, versionCode, releaseNotes)
+        logger.info("Deploying app: $packageName to $track with ${(rolloutPercentage * 100).toInt()}% rollout")
+        playStoreClient.deployApp(packageName, track, apkPath, versionCode, releaseNotes, rolloutPercentage)
     }
 
     /**
