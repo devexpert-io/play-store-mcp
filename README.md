@@ -124,6 +124,8 @@ To build the project:
 
 This will generate the JAR file at `build/libs/play-store-mcp-all.jar`.
 
+You can also download the `jar` from the latest [release](https://github.com/devexpert-io/play-store-mcp/releases).
+
 ## Usage
 
 Once configured, you can use the tools from any compatible MCP client.
