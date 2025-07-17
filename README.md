@@ -140,9 +140,9 @@ To release a new version of the App to the alpha channel, you can say:
 
 > Upgrade the version of the App, build the AAB, and upload it to the alpha channel.
 
-To deploy with a gradual rollout (e.g., 10% of users):
+To deploy with a gradual rollout (e.g., 50% of users):
 
-> Deploy version 123 of com.example.myapp to production with a 10% rollout.
+> Update the App version, compile the AAB, and publish it to the Play Store on the alpha channel with a 50% rollout, using the @release_notes.txt.
 
 ## Requirements
 
