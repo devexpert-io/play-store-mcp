@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.Server
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import org.slf4j.LoggerFactory
@@ -29,12 +28,16 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
                     put("track", buildJsonObject {
                         put("type", JsonPrimitive("string"))
                         put("description", JsonPrimitive("Release track: internal, alpha, beta, production"))
-                        put("enum", kotlinx.serialization.json.JsonArray(listOf(
-                            JsonPrimitive("internal"),
-                            JsonPrimitive("alpha"), 
-                            JsonPrimitive("beta"),
-                            JsonPrimitive("production")
-                        )))
+                        put(
+                            "enum", kotlinx.serialization.json.JsonArray(
+                                listOf(
+                                    JsonPrimitive("internal"),
+                                    JsonPrimitive("alpha"),
+                                    JsonPrimitive("beta"),
+                                    JsonPrimitive("production")
+                                )
+                            )
+                        )
                     })
                     put("apkPath", buildJsonObject {
                         put("type", JsonPrimitive("string"))
@@ -50,7 +53,10 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
                     })
                     put("rolloutPercentage", buildJsonObject {
                         put("type", JsonPrimitive("number"))
-                        put("description", JsonPrimitive("Rollout percentage (0.0 to 1.0, default: 1.0 for full rollout)"))
+                        put(
+                            "description",
+                            JsonPrimitive("Rollout percentage (0.0 to 1.0, default: 1.0 for full rollout)")
+                        )
                         put("minimum", JsonPrimitive(0.0))
                         put("maximum", JsonPrimitive(1.0))
                     })
@@ -67,9 +73,8 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
 
             logger.info("Deploy app tool called: $packageName to $track track with ${(rolloutPercentage * 100).toInt()}% rollout")
 
-            val deploymentResult = runBlocking {
+            val deploymentResult =
                 playStoreService.deployApp(packageName, track, apkPath, versionCode, releaseNotes, rolloutPercentage)
-            }
 
             val result = buildString {
                 if (deploymentResult.success) {
@@ -115,20 +120,28 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
                     put("fromTrack", buildJsonObject {
                         put("type", JsonPrimitive("string"))
                         put("description", JsonPrimitive("Source track"))
-                        put("enum", kotlinx.serialization.json.JsonArray(listOf(
-                            JsonPrimitive("internal"),
-                            JsonPrimitive("alpha"), 
-                            JsonPrimitive("beta")
-                        )))
+                        put(
+                            "enum", kotlinx.serialization.json.JsonArray(
+                                listOf(
+                                    JsonPrimitive("internal"),
+                                    JsonPrimitive("alpha"),
+                                    JsonPrimitive("beta")
+                                )
+                            )
+                        )
                     })
                     put("toTrack", buildJsonObject {
                         put("type", JsonPrimitive("string"))
                         put("description", JsonPrimitive("Target track"))
-                        put("enum", kotlinx.serialization.json.JsonArray(listOf(
-                            JsonPrimitive("alpha"), 
-                            JsonPrimitive("beta"),
-                            JsonPrimitive("production")
-                        )))
+                        put(
+                            "enum", kotlinx.serialization.json.JsonArray(
+                                listOf(
+                                    JsonPrimitive("alpha"),
+                                    JsonPrimitive("beta"),
+                                    JsonPrimitive("production")
+                                )
+                            )
+                        )
                     })
                     put("versionCode", buildJsonObject {
                         put("type", JsonPrimitive("integer"))
@@ -145,9 +158,7 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
 
             logger.info("Promote release tool called: $packageName from $fromTrack to $toTrack")
 
-            val promotionResult = runBlocking {
-                playStoreService.promoteRelease(packageName, fromTrack, toTrack, versionCode)
-            }
+            val promotionResult = playStoreService.promoteRelease(packageName, fromTrack, toTrack, versionCode)
 
             val result = buildString {
                 if (promotionResult.success) {
@@ -203,9 +214,7 @@ class PlayStoreTools(private val playStoreService: PlayStoreService) {
 
             logger.info("Get releases tool called for package: $packageName")
 
-            val releasesJson = runBlocking {
-                playStoreService.getReleases(packageName)
-            }
+            val releasesJson = playStoreService.getReleases(packageName)
 
             CallToolResult(
                 content = listOf(

@@ -1,5 +1,6 @@
 package io.devexpert.transport
 
+import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.StdioServerTransport
 import kotlinx.coroutines.Job
@@ -16,7 +17,7 @@ class StdioTransport {
         logger.info("Starting STDIO transport...")
         
         try {
-            val inputSource = System.`in`.asSource().buffered()
+            val inputSource = System.`in`.asInput()
             val outputSink = System.out.asSink().buffered()
             
             val transport = StdioServerTransport(
